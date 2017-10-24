@@ -1,0 +1,239 @@
+﻿<Window x:Class="TempProject.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:formula="clr-namespace:WpfMath.Controls;assembly=WpfMath"
+        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        mc:Ignorable="d"
+        Title="Differential Equation" Height="680" Width="1500">
+    <Window.Resources>
+        <Style TargetType="DataGridCell">
+            <Style.Setters>
+                <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            </Style.Setters>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+    <TabControl Margin="10">
+        <TabItem Header="Differential equation">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Input data" Grid.Column="0" Margin="10">
+                    <Grid Margin="-1,0,1,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="TB1Formula" Visibility="Hidden"/>
+                        <TextBox x:Name="TB2Formula" Visibility="Hidden"/>
+                        <StackPanel Grid.Row="0">
+                            <Border Margin="10" BorderBrush="LightGray" BorderThickness="1">
+                                <ScrollViewer Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <formula:FormulaControl Grid.Column="0" Margin="5" Formula="{Binding Text, ElementName=TB1Formula, NotifyOnValidationError=True}" 
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Scale="20"/>
+                                </ScrollViewer>
+                            </Border>
+                            <Border Margin="10" BorderBrush="LightGray" BorderThickness="1">
+                                <ScrollViewer Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <formula:FormulaControl Grid.Column="0" Margin="5" Formula="{Binding Text, ElementName=TB2Formula, NotifyOnValidationError=True}" 
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Scale="20"/>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter n" Grid.Row="0"  Margin="5" FontSize="16"/>
+                                <TextBox Name="TBN" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" Text="4" FontSize="20"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter m" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox Name="TBM" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" Text="5" FontSize="20"/>
+                            </Grid>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter t" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox Name="TBT" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="3"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter rho(0)" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBRho" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="2"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter b" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBB" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="3"/>
+                            </Grid>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter w" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBW" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="4"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter g" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBG" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="5"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter k" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBK" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="3"/>
+                            </Grid>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Enter H" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBH" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="1"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                </Grid.RowDefinitions>
+                                <Label Content="Steps" Grid.Row="0" Margin="5" FontSize="16"/>
+                                <TextBox x:Name="TBSteps" Grid.Row="1" Margin="10" VerticalContentAlignment="Center" FontSize="20" Text="100"/>
+                            </Grid>
+                            <Button x:Name="BSolveEquation" Grid.Column="1" Margin="10,50,10,10" Content="Решить" Click="BSolveEquation_Click"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <chartingToolkit:Chart x:Name="LineChart" Grid.Column="2" Margin="10">
+                    <chartingToolkit:LineSeries Title="DE solution" DependentValuePath="Value" IndependentValuePath="Key" IsSelectionEnabled="True"/>
+                </chartingToolkit:Chart>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Integration">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Input data" Grid.Column="0" Margin="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="60"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="TB3Formula" Visibility="Hidden"/>
+                        <Border Grid.Row="0" Margin="10" BorderBrush="LightGray" BorderThickness="1">
+                            <ScrollViewer Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <formula:FormulaControl Grid.Column="0" Margin="5" Formula="{Binding Text, ElementName=TB3Formula, NotifyOnValidationError=True}" 
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Scale="30"/>
+                            </ScrollViewer>
+                        </Border>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="Vz function" Grid.Column="0" BorderThickness="0">
+                                <DataGrid x:Name="DGSourceFunction" Grid.Column="0" Margin="5" AutoGenerateColumns="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="z" Binding="{Binding Key}" Width="1*"/>
+                                        <DataGridTextColumn Header="Vz" Binding="{Binding Value}" Width="1*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </GroupBox>
+                            <GroupBox Header="(Vz)' function" Grid.Column="1" BorderThickness="0">
+                                <DataGrid x:Name="DGFunctionDerivative" Margin="5" AutoGenerateColumns="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="z" Binding="{Binding Key}" Width="1*"/>
+                                        <DataGridTextColumn Header="Vz" Binding="{Binding Value}" Width="1*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </GroupBox>
+                        </Grid>
+                        <Button x:Name="BSolveIntegral" Content="Решить" Grid.Row="3" Margin="10" Width="250" Click="BSolveIntegral_Click"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Margin="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="(Vz)' squared function" Grid.Column="0" BorderThickness="0">
+                            <DataGrid x:Name="DGDerivativeFunctionSquared" Margin="10">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="z" Binding="{Binding Key}" Width="1*"/>
+                                    <DataGridTextColumn Header="Vz" Binding="{Binding Value}" Width="1*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                        <GroupBox Header="E function" Grid.Column="1" BorderThickness="0">
+                            <DataGrid x:Name="DGIntegralFunction" Grid.Row="1" Margin="10">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="z" Binding="{Binding Key}" Width="1*"/>
+                                    <DataGridTextColumn Header="Vz" Binding="{Binding Value}" Width="1*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>
