@@ -133,8 +133,19 @@ namespace TempProject
             //find squared derivative function
             var squaredDerivativeTable = SquareFunction(derivativeSolutionsTable);
 
+            //calculate integral
+            var resA = SimpsonIntegrate(squaredDerivativeTable, -H, 0, steps);
+            var resB = SimpsonIntegrate(squaredSolutionsTable, -H, 0, steps);
+
+            var calculatedE = resA * (Math.Pow(SigmaFunction(t), 2) + 4 * Math.Pow(w, 2)) / ((Math.Pow(SigmaFunction(t), 2)) * (Math.Pow(m, 2) + Math.Pow(n, 2))) + resB;
+
             //fill function derivative table
             DGFunctionDerivative.ItemsSource = derivativeSolutionsTable;
+            //fill derivative squared table
+            DGDerivativeFunctionSquared.ItemsSource = squaredDerivativeTable;
+
+            //fill integral value
+            TBEValue.Text = Math.Round(calculatedE, 4).ToString();
         }
 
         /// <summary>
@@ -232,6 +243,26 @@ namespace TempProject
             }
 
             return temp;
+        }
+
+        public double SimpsonIntegrate(Dictionary<double, double> d, double leftBound, double rightBound, int count)
+        {
+            List<double> xs = new List<double>(d.Keys);
+            List<double> ys = new List<double>(d.Values);
+            int n = ys.Count - 1;
+
+            double h = (rightBound - leftBound) / count, result = 0;
+
+            for(int i = 1; i < xs.Count - 2; i++)
+            {
+                if(i % 2 == 0)
+                    result += 4 * ys[i];
+                else
+                    result += 2 * ys[i];
+            }
+            result = h / 3 * (result + ys[0] - ys[n]);
+
+            return result; 
         }
     }
 }
