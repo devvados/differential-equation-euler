@@ -11,14 +11,25 @@ namespace TempProject
     public partial class MainWindow : Window
     {
         //solutions
-        public Dictionary<double, double> sourceSolutionsTable = new Dictionary<double, double>();
+        public Dictionary<double, double> sourceSolutionsTable = new Dictionary<double, double>(),
+                                          derivativeSolutionsTable = new Dictionary<double, double>(),
+                                          squaredSolutionsTable = new Dictionary<double, double>(),
+                                          squaredDerivativeTable = new Dictionary<double, double>();
 
         //differential equation parameters
         public static double m, n, t, rhoUpper0, b, g, k, w, H, NSquared, h;
         public static int steps = 0;
 
+        //function to optimize parameters
+        double VzDerivativeSquared, VzSquared;
+
         //differential equation replacement coefficients
         public static double DifEqCoefB, DifEqCoefC;
+
+        public double FunctionToOptimize(double sigma)
+        {
+            return VzDerivativeSquared * (Math.Pow(sigma, 2) + 4 * (Math.Pow(w, 2))) / (Math.Pow(sigma, 2) * (Math.Pow(n, 2) + Math.Pow(m, 2))) + VzSquared;
+        }
 
         #region defferential equation parameters and their calculation
 
@@ -94,15 +105,24 @@ namespace TempProject
         {
             InitializeComponent();
 
+            sourceSolutionsTable.Add(1, 0);
+
             TB1Formula.Text = @"V''_z+(\ln\rho_0)'V'_z-\frac{m^2+n^2}{\sigma^2-4w^2}(\sigma^2-N^2)V_z=0";
             TB2Formula.Text = @"V_z|_{z=0}=0, V_z|_{z=-H}=b\sigma";
             TB3Formula.Text = @"E=\int_{-H}^{0}(V'_z)^2dz\cdot\frac{\sigma^2+4w^2}{\sigma^2(n^2+m^2)}+\int_{-H}^{0}V_{z}^{2}dz";
+            TB4Formula.Text = @"E=(V'_z)^2\cdot\frac{\sigma^2+4w^2}{\sigma^2(n^2+m^2)}+V_{z}^2";
+
+            //create chart view
+            ((LineSeries)LineChart.Series[0]).ItemsSource = sourceSolutionsTable;
         }
 
         private void BSolveEquation_Click(object sender, RoutedEventArgs e)
         {
             //clear solutions table
             sourceSolutionsTable.Clear();
+            derivativeSolutionsTable.Clear();
+            squaredSolutionsTable.Clear();
+            squaredDerivativeTable.Clear();
 
             //init values
             InputData();
@@ -125,13 +145,13 @@ namespace TempProject
         private void BSolveIntegral_Click(object sender, RoutedEventArgs e)
         {
             //find derivative
-            var derivativeSolutionsTable = FindDerivative(sourceSolutionsTable);
+            derivativeSolutionsTable = FindDerivative(sourceSolutionsTable);
 
             //find squared function
-            var squaredSolutionsTable = SquareFunction(sourceSolutionsTable);
+            squaredSolutionsTable = SquareFunction(sourceSolutionsTable);
 
             //find squared derivative function
-            var squaredDerivativeTable = SquareFunction(derivativeSolutionsTable);
+            squaredDerivativeTable = SquareFunction(derivativeSolutionsTable);
 
             //calculate integral
             var resA = SimpsonIntegrate(squaredDerivativeTable, -H, 0, steps);
@@ -146,6 +166,18 @@ namespace TempProject
 
             //fill integral value
             TBEValue.Text = Math.Round(calculatedE, 4).ToString();
+
+            //fill source data for optimization
+            DGSourceFunctionSquared.ItemsSource = squaredSolutionsTable;
+            DGFunctionDerivativeSquared.ItemsSource = squaredDerivativeTable;
+        }
+
+        private void BOptimizeFunction_Click(object sender, RoutedEventArgs e)
+        {
+            var EandSigmaValues = OptimizeFunction();
+
+            //fill datagrid
+            DGSigmaAndEValues.ItemsSource = EandSigmaValues;
         }
 
         /// <summary>
@@ -263,6 +295,135 @@ namespace TempProject
             result = h / 3 * (result + ys[0] - ys[n]);
 
             return result; 
+        }
+
+        /// <summary>
+        /// Newton interpolation
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="n"></param>
+        /// <param name="MasX"></param>
+        /// <param name="MasY"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public double Newton(double x, int n, List<double> MasX, List<double> MasY, double step)
+        {
+            double[,] mas = new double[n + 2, n + 1];
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < n + 1; j++)
+                {
+                    if (i == 0)
+                        mas[i, j] = MasX[j];
+                    else if (i == 1)
+                        mas[i, j] = MasY[j];
+                }
+            }
+            int m = n;
+            for (int i = 2; i < n + 2; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    mas[i, j] = mas[i - 1, j + 1] - mas[i - 1, j];
+                }
+                m--;
+            }
+
+            double[] dy0 = new double[n + 1];
+
+            for (int i = 0; i < n + 1; i++)
+            {
+                dy0[i] = mas[i + 1, 0];
+            }
+
+            double res = dy0[0];
+            double[] xn = new double[n];
+            xn[0] = x - mas[0, 0];
+
+            for (int i = 1; i < n; i++)
+            {
+                double ans = xn[i - 1] * (x - mas[0, i]);
+                xn[i] = ans;
+                ans = 0;
+            }
+
+            int m1 = n + 1;
+            int fact = 1;
+            for (int i = 1; i < m1; i++)
+            {
+                fact = fact * i;
+                res = res + (dy0[i] * xn[i - 1]) / (fact * Math.Pow(step, i));
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Optimize function -> MIN
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<double, double> OptimizeFunction()
+        {
+            Dictionary<double, double> result = new Dictionary<double, double>();
+            var keys1 = new List<double>(squaredDerivativeTable.Keys);
+            var keys2 = new List<double>(squaredSolutionsTable.Keys);
+            double leftBound = -1, rightBound = 0;
+
+            for(int i = 0; i < keys1.Count; i++)
+            {                
+                VzDerivativeSquared = squaredDerivativeTable[keys1[i]];
+                VzSquared = squaredSolutionsTable[keys2[i]];
+
+                var pair = GoldenSectionMethod(leftBound, rightBound);
+
+                if (!result.ContainsKey(pair.Key))
+                {
+                    result.Add(pair.Key, pair.Value);
+                }
+                else if (pair.Value < result[pair.Key])
+                {
+                    result.Remove(pair.Key);
+                    result.Add(pair.Key, pair.Value);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Get E and Sigma values
+        /// </summary>
+        /// <param name="leftBound"></param>
+        /// <param name="rightBound"></param>
+        /// <returns></returns>
+        public KeyValuePair<double, double> GoldenSectionMethod(double leftBound, double rightBound)
+        {
+            double tau = (Math.Sqrt(5) - 1) / 2;
+            double epsilon = 1e-7;
+            double sigma1 = 0, sigma2 = 0, f1 = 0, f2 = 0;
+            double a = leftBound, b = rightBound;
+
+            while (b-a > epsilon)
+            {
+                sigma1 = a + (1 - tau) * (b - a);
+                sigma2 = a + tau * (b - a);
+                f1 = FunctionToOptimize(sigma1);
+                f2 = FunctionToOptimize(sigma2);
+
+                if (f1 > f2)
+                {
+                    a = sigma1;
+                }
+                else
+                    b = sigma2;
+            }
+            if((b-a) <= epsilon)
+            {
+                sigma1 = (b + a) / 2;
+                f1 = FunctionToOptimize(sigma1);
+            }
+
+            return new KeyValuePair<double, double>(sigma1, f1);
         }
     }
 }
